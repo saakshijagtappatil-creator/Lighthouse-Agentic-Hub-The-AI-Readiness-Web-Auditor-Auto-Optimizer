@@ -303,6 +303,25 @@ class AuditAgent(BaseAgent):
             yield event
 
 
+class BenchmarkAgent(BaseAgent):
+    """Runs Lighthouse CLI post-remediation to compare. See SPEC.md §4.5."""
+
+    async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        target_dict = ctx.session.state.get("target")
+        if not target_dict:
+            yield _text_event(self.name, ctx, "[BENCHMARK] error: no target found in state")
+            return
+        target = TargetRef(**target_dict)
+        async for event in _run_audit_shared(
+            agent_name=self.name,
+            ctx=ctx,
+            target=target,
+            state_key="after_audit_result",
+            log_prefix="BENCHMARK",
+        ):
+            yield event
+
+
 # ---------------------------------------------------------------------------
 # 3. Diagnosis — LlmAgent, structured output
 # ---------------------------------------------------------------------------
@@ -676,6 +695,7 @@ root_agent = SequentialAgent(
         diagnosis_agent,
         remediation_draft_agent,
         RemediationExecuteAgent(name="remediation_execute_agent", description="Executes drafted file changes."),
+        BenchmarkAgent(name="benchmark_agent", description="Runs Lighthouse CLI post-remediation to compare."),
     ],
 )
 
