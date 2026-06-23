@@ -1,17 +1,19 @@
-# Luminary — Premium Hardware
+# Luminary Premium Hardware
 
-Luminary is a premium hardware brand specializing in high-performance workspace consoles crafted from grade-5 brushed titanium, designed to elevate digital production and cognitive flow.
+Luminary creates premium hardware for modern workflows, featuring Grade-5 titanium construction and precision digital controls.
 
-## Navigation
+## Main Navigation
 - [Home Page](index.html)
 - [Products](#products)
 - [Innovation](#features)
+- [About](#about)
 - [Connect](#connect)
 
 ## Key Products
-- **Horizon Display**: A 32-inch 6K retina canvas.
-- **Keyframe Core**: A CNC aluminum mechanical keyboard with haptic dampeners.
-- **Acoustic Bar**: A cylindrical soundbar using active wave-guiding.
+- [Horizon Display](index.html#products): 32-inch 6K retina canvas.
+- [Keyframe Core](index.html#products): Low-profile mechanical keyboard.
+- [Acoustic Bar](index.html#products): Cylindrical space-filling soundbar.
 
-## Contact & Updates
-- [Request Access](#connect)
+## Documentation
+- [Innovation Features](index.html#features): Technical details on titanium alloy, acoustic design, and active haptics.
+- [Contact/Allocation](index.html#connect): Request access to premium customized configurations.

@@ -92,6 +92,36 @@ def _state_event(agent_name: str, ctx: InvocationContext, state_delta: dict) -> 
 # 1. Intake — deterministic, reads the user's chat message, no LLM call
 # ---------------------------------------------------------------------------
 
+def _format_proposal_box(changes: list[dict]) -> str:
+    width = 45
+    box = []
+    box.append("┌" + "─" * width + "┐")
+    box.append("│" + "PROPOSED CHANGES — Review Before Applying".center(width) + "│")
+    box.append("├" + "─" * width + "┤")
+    
+    if not changes:
+        box.append("│" + "No automatic fixes are proposed for this".center(width) + "│")
+        box.append("│" + "run. Only manual issues need attention.".center(width) + "│")
+    else:
+        for idx, change in enumerate(changes):
+            if idx > 0:
+                box.append("│" + " ".center(width) + "│")
+            header = f"  {change['type']:<8} {change['file']}"
+            box.append("│" + header.ljust(width) + "│")
+            for line in change["lines"]:
+                detail_line = f"           {line}"
+                box.append("│" + detail_line.ljust(width) + "│")
+            
+    box.append("│" + " ".center(width) + "│")
+    box.append("│" + "Type \"yes\" to apply, \"no\" to skip fixes".center(width) + "│")
+    box.append("└" + "─" * width + "┘")
+    return "```\n" + "\n".join(box) + "\n```"
+
+
+# ---------------------------------------------------------------------------
+# 1. Intake — deterministic, reads the user's chat message, no LLM call
+# ---------------------------------------------------------------------------
+
 class IntakeAgent(BaseAgent):
     """Parses the user's input into a TargetRef. See SPEC.md §4.1.
 
@@ -107,7 +137,20 @@ class IntakeAgent(BaseAgent):
         if ctx.user_content and ctx.user_content.parts:
             text = (ctx.user_content.parts[0].text or "").strip()
 
+        waiting_for_confirmation = ctx.session.state.get("waiting_for_confirmation", False)
         tokens = text.split()
+        is_new_audit = "--path" in tokens or "--url" in tokens
+
+        if waiting_for_confirmation and not is_new_audit:
+            response = text.lower().strip()
+            yield _state_event(self.name, ctx, {
+                "confirmation_response": response,
+                "waiting_for_confirmation": False
+            })
+            yield _text_event(self.name, ctx, f"Confirmation received: {response}")
+            return
+
+        # Starting a new audit: parse path or url, and reset confirmation/audit state keys
         path = None
         url = None
         if "--path" in tokens:
@@ -144,7 +187,17 @@ class IntakeAgent(BaseAgent):
             return
 
         print(f"[INTAKE] resolved target: {target.source_type} = {target.value}")
-        yield _state_event(self.name, ctx, {"target": target.model_dump()})
+        yield _state_event(self.name, ctx, {
+            "target": target.model_dump(),
+            "confirmation_response": None,
+            "waiting_for_confirmation": False,
+            "audit_result": None,
+            "after_audit_result": None,
+            "remediation_draft": None,
+            "remediation_result": None,
+            "diagnosis_items": None,
+            "final_report": None
+        })
         yield _text_event(self.name, ctx, f"Target resolved: {target.source_type} = {target.value}")
 
 
@@ -360,6 +413,9 @@ class AuditAgent(BaseAgent):
     """Runs Lighthouse against the target. See SPEC.md §4.2."""
 
     async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        if ctx.session.state.get("confirmation_response") is not None:
+            return
+
         target_dict = ctx.session.state.get("target")
         if not target_dict:
             yield _text_event(self.name, ctx, "[AUDIT] error: no target found in state — did Intake run?")
@@ -379,19 +435,32 @@ class BenchmarkAgent(BaseAgent):
     """Runs Lighthouse CLI post-remediation to compare. See SPEC.md §4.5."""
 
     async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        if ctx.session.state.get("waiting_for_confirmation", False):
+            return
+        confirmation_response = ctx.session.state.get("confirmation_response")
+        if confirmation_response is None:
+            return
+
         target_dict = ctx.session.state.get("target")
         if not target_dict:
             yield _text_event(self.name, ctx, "[BENCHMARK] error: no target found in state")
             return
         target = TargetRef(**target_dict)
-        async for event in _run_audit_shared(
-            agent_name=self.name,
-            ctx=ctx,
-            target=target,
-            state_key="after_audit_result",
-            log_prefix="BENCHMARK",
-        ):
-            yield event
+
+        if confirmation_response == "yes":
+            async for event in _run_audit_shared(
+                agent_name=self.name,
+                ctx=ctx,
+                target=target,
+                state_key="after_audit_result",
+                log_prefix="BENCHMARK",
+            ):
+                yield event
+        else:
+            # If rejected/skipped, files are not modified, so after is same as before
+            audit_dict = ctx.session.state.get("audit_result")
+            yield _state_event(self.name, ctx, {"after_audit_result": audit_dict})
+            yield _text_event(self.name, ctx, "[BENCHMARK] skipped since no fixes were applied")
 
 
 # ---------------------------------------------------------------------------
@@ -453,7 +522,17 @@ def _diagnosis_instruction(ctx) -> str:
         """
 
 
-diagnosis_agent = LlmAgent(
+class SkippableLlmAgent(LlmAgent):
+    """LlmAgent wrapper that skips LLM execution on Turn 2 if confirmation_response is present in state."""
+
+    async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        if ctx.session.state.get("confirmation_response") is not None:
+            return
+        async for event in super()._run_async_impl(ctx):
+            yield event
+
+
+diagnosis_agent = SkippableLlmAgent(
     name="diagnosis_agent",
     model="gemini-3.1-flash-lite",
     instruction=_diagnosis_instruction,
@@ -559,6 +638,8 @@ class RemediationDraftAgent(LlmAgent):
         return base_instruction
 
     async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        if ctx.session.state.get("confirmation_response") is not None:
+            return
         ctx.session.state["_remediation_draft_error"] = None
         try:
             async for event in super()._run_async_impl(ctx):
@@ -627,8 +708,74 @@ class RemediationExecuteAgent(BaseAgent):
             return
         draft = RemediationDraft(**draft_dict)
 
+        waiting_for_confirmation = ctx.session.state.get("waiting_for_confirmation", False)
+        confirmation_response = ctx.session.state.get("confirmation_response")
+
+        if confirmation_response is None and not waiting_for_confirmation:
+            changes = []
+            if draft.llms_txt_content:
+                changes.append({
+                    "type": "CREATE",
+                    "file": "llms.txt",
+                    "lines": [
+                        "A new instructions file for AI",
+                        "agents will be written to the",
+                        "site root."
+                    ]
+                })
+            if draft.geo_schema_draft:
+                changes.append({
+                    "type": "INJECT",
+                    "file": "index.html",
+                    "lines": [
+                        "JSON-LD schema block will be",
+                        "added to <head>. This adds",
+                        "~8 lines. No existing content",
+                        "is modified or removed."
+                    ]
+                })
+            if draft.aria_suggestions:
+                cnt = len(draft.aria_suggestions)
+                el_word = "element" if cnt == 1 else "elements"
+                changes.append({
+                    "type": "INJECT",
+                    "file": "index.html",
+                    "lines": [
+                        f"ARIA labels added to {cnt} {el_word}.",
+                        "Attribute additions only —",
+                        "no layout or style changes."
+                    ]
+                })
+
+            proposal_msg = _format_proposal_box(changes)
+            yield _text_event(self.name, ctx, proposal_msg)
+            yield _state_event(self.name, ctx, {"waiting_for_confirmation": True})
+            return
+
+        if waiting_for_confirmation:
+            return
+
         actions = []
         is_url = target.source_type == "url"
+
+        if confirmation_response != "yes":
+            for item in diagnosis_result.items:
+                actions.append(RemediationAction(
+                    check_id=item.check_id,
+                    file_path="index.html" if item.remediation_type in ("geo_schema", "aria_labels") else "N/A",
+                    action_taken="skipped_user_rejected",
+                    diff_summary="Skipped: remediation rejected by the user.",
+                ))
+            remediation_result = RemediationResult(
+                diagnosis=diagnosis_result,
+                actions=actions,
+            )
+            yield _state_event(self.name, ctx, {"remediation_result": remediation_result.model_dump()})
+            yield _text_event(
+                self.name, ctx,
+                f"[REMEDIATION] complete — {len(actions)} actions recorded.",
+            )
+            return
 
         for item in diagnosis_result.items:
             print(f"[REMEDIATION] processing check {item.check_id} (type: {item.remediation_type})")
@@ -943,6 +1090,11 @@ class ReportAgent(BaseAgent):
         """
 
     async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        if ctx.session.state.get("waiting_for_confirmation", False):
+            return
+        if ctx.session.state.get("confirmation_response") is None:
+            return
+
         import json as json_module
         import os
         from datetime import datetime, timezone
@@ -2549,9 +2701,11 @@ BENCHMARK
                 artifact=google.genai.types.Part(
                     inline_data=google.genai.types.Blob(
                         mime_type="text/html",
-                        data=report_html_content.encode("utf-8")
+                        data=report_html_content.encode("utf-8"),
+                        display_name="report.html"
                     )
-                )
+                ),
+                custom_metadata={"display_name": "report.html"}
             )
             yield Event(
                 author=self.name,
@@ -2594,11 +2748,15 @@ BENCHMARK
             f"  Performance:  {perf_text}  \n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  \n"
             "  Your full interactive report is ready.  \n"
-            "  Click report.html above to open it.  \n"
+            "  Click text.html above to open it.  \n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         )
 
-        yield _state_event(self.name, ctx, {"final_report": final_report.model_dump()})
+        yield _state_event(self.name, ctx, {
+            "final_report": final_report.model_dump(),
+            "confirmation_response": None,
+            "waiting_for_confirmation": False
+        })
         yield _text_event(self.name, ctx, summary_message)
 
 

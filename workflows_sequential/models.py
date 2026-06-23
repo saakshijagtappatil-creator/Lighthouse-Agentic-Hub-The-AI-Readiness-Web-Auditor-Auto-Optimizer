@@ -129,6 +129,7 @@ ActionTaken = Literal[
     "modified",
     "skipped_already_present",
     "skipped_unsafe",
+    "skipped_user_rejected",
 ]
 
 
