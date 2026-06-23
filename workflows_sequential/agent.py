@@ -305,6 +305,36 @@ async def _run_audit_shared(
             "category": "agentic_browsing",
         })
 
+        # --- Custom GEO Schema Markup check ---
+        has_json_ld = False
+        if target.source_type == "local_path":
+            index_path = os.path.join(target.value, "index.html")
+            if os.path.exists(index_path):
+                try:
+                    with open(index_path, "r", encoding="utf-8") as f:
+                        html_content = f.read()
+                        has_json_ld = "application/ld+json" in html_content
+                except Exception:
+                    pass
+        else:
+            try:
+                # For remote URLs, fetch the main page HTML
+                req = urllib.request.Request(base_url, method="GET")
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    html_content = resp.read().decode("utf-8", errors="ignore")
+                    has_json_ld = "application/ld+json" in html_content
+            except Exception:
+                pass
+        
+        findings.append({
+            "check_id": "geo-schema-markup",
+            "applicable": True,
+            "passed": has_json_ld,
+            "raw_score": 1.0 if has_json_ld else 0.0,
+            "details": "JSON-LD schema markup detected" if has_json_ld else "Missing JSON-LD schema metadata for LLM citation and search RAG optimizations",
+            "category": "geo_readiness",
+        })
+
         audit_result = AuditResult(
             target=target,
             run_at=datetime.now(timezone.utc).isoformat(),
@@ -399,6 +429,7 @@ def _diagnosis_instruction(ctx) -> str:
         - "llms-txt" (quality) or "llms-txt-exists" (presence) failures
           -> remediation_type="llms_txt"
         - "agent-accessibility-tree" failures -> remediation_type="aria_labels"
+        - "geo-schema-markup" failures -> remediation_type="geo_schema"
         - Passing or not-applicable findings -> severity="info",
           remediation_type="not_auto_fixable"
 
@@ -461,6 +492,7 @@ def _remediation_draft_instruction(ctx) -> str:
              * `element_snippet`: a distinct line or tag snippet from the original HTML (e.g. `<button class="menu-btn">` or `<a href="/menu">`) to help locate it.
              * `aria_label`: a descriptive, meaningful aria-label (e.g. "Toggle navigation menu").
         3. If a check with check_id "webmcp-form-coverage", "webmcp-registered-tools", or "webmcp-schema-validity" failed, or if the diagnosis asks for "webmcp_suggestion_only" remediation, draft a suggested WebMCP integration code snippet or guide and place it in the `webmcp_suggestion` field.
+        4. If a check with check_id "geo-schema-markup" failed, or if the diagnosis asks for "geo_schema" remediation, you must draft a valid JSON-LD schema script block (as a raw JSON string without surrounding script tags) that describes the website content (e.g. Organization, Product, or WebSite type based on the HTML content provided). Put the raw JSON string in the `geo_schema_draft` field.
         
         Safety rules:
         - Do not propose modifying anything other than adding aria-label or role attributes.
@@ -644,6 +676,65 @@ class RemediationExecuteAgent(BaseAgent):
                                 diff_summary="Skipped: no llms.txt content drafted by LLM.",
                             ))
 
+            elif item.remediation_type == "geo_schema":
+                if is_url:
+                    actions.append(RemediationAction(
+                        check_id=item.check_id,
+                        file_path="N/A",
+                        action_taken="skipped_unsafe",
+                        diff_summary="Skipped: target is a remote URL, cannot modify local HTML files.",
+                    ))
+                else:
+                    if not draft.geo_schema_draft:
+                        actions.append(RemediationAction(
+                            check_id=item.check_id,
+                            file_path="N/A",
+                            action_taken="skipped_unsafe",
+                            diff_summary="Skipped: no GEO JSON-LD schema drafted by LLM.",
+                        ))
+                    else:
+                        safe_path = os.path.normpath(os.path.join(target.value, "index.html"))
+                        if not os.path.exists(safe_path):
+                            actions.append(RemediationAction(
+                                check_id=item.check_id,
+                                file_path="index.html",
+                                action_taken="skipped_unsafe",
+                                diff_summary="Skipped: index.html file does not exist.",
+                            ))
+                        else:
+                            try:
+                                with open(safe_path, "r", encoding="utf-8") as f:
+                                    html = f.read()
+                                
+                                soup = BeautifulSoup(html, "html.parser")
+                                script_tag = soup.new_tag("script", type="application/ld+json")
+                                script_tag.string = draft.geo_schema_draft
+                                
+                                if soup.head:
+                                    soup.head.append(script_tag)
+                                else:
+                                    if soup.html:
+                                        soup.html.insert(0, script_tag)
+                                    else:
+                                        soup.append(script_tag)
+                                        
+                                with open(safe_path, "w", encoding="utf-8") as f:
+                                    f.write(str(soup))
+                                    
+                                actions.append(RemediationAction(
+                                    check_id=item.check_id,
+                                    file_path="index.html",
+                                    action_taken="modified",
+                                    diff_summary=f"Injected JSON-LD structured schema metadata inside <head>.",
+                                ))
+                            except Exception as e:
+                                actions.append(RemediationAction(
+                                    check_id=item.check_id,
+                                    file_path="index.html",
+                                    action_taken="skipped_unsafe",
+                                    diff_summary=f"Skipped: error injecting JSON-LD: {e}",
+                                ))
+
             elif item.remediation_type == "aria_labels":
                 if is_url:
                     actions.append(RemediationAction(
@@ -786,6 +877,8 @@ class ReportAgent(BaseAgent):
                 return "ACTION REQUIRED: Declare explicit width and height dimensions on images and media blocks to prevent CLS."
             else:
                 return "ACTION REQUIRED: Fix formatting or quality issues in the existing llms.txt file."
+        elif category == "geo_readiness":
+            return "ACTION REQUIRED: Add structured JSON-LD schema metadata to <head> to optimize content for LLM discovery and citations."
         elif category == "accessibility":
             if check_id == "color-contrast":
                 return "ACTION REQUIRED: Increase background/foreground color contrast ratios to meet WCAG AA standards (minimum 4.5:1)."
@@ -922,6 +1015,7 @@ class ReportAgent(BaseAgent):
         agentic_lines = []
         a11y_lines = []
         perf_lines = []
+        geo_lines = []
 
         # Friendly name mapping
         name_map = {
@@ -936,6 +1030,7 @@ class ReportAgent(BaseAgent):
             "image-alt": "Image Alt Text",
             "first-contentful-paint": "First Contentful Paint",
             "largest-contentful-paint": "Largest Contentful Paint",
+            "geo-schema-markup": "Custom GEO Schema Markup",
         }
 
         # HTML generation containers
@@ -943,6 +1038,7 @@ class ReportAgent(BaseAgent):
 
         categories_metadata = [
             ("agentic_browsing", "AGENTIC BROWSING"),
+            ("geo_readiness", "GEO READINESS"),
             ("accessibility", "ACCESSIBILITY"),
             ("performance", "PERFORMANCE")
         ]
@@ -993,6 +1089,8 @@ class ReportAgent(BaseAgent):
                 line_str = f"  {status_text:<6} {name:<22} - {desc}"
                 if cat_id == "agentic_browsing":
                     agentic_lines.append(line_str)
+                elif cat_id == "geo_readiness":
+                    geo_lines.append(line_str)
                 elif cat_id == "accessibility":
                     a11y_lines.append(line_str)
                 elif cat_id == "performance":
@@ -1052,6 +1150,7 @@ class ReportAgent(BaseAgent):
             """
 
         agentic_block = "\n".join(agentic_lines)
+        geo_block = "\n".join(geo_lines)
         a11y_block = "\n".join(a11y_lines)
         perf_block = "\n".join(perf_lines)
 
@@ -1061,7 +1160,8 @@ class ReportAgent(BaseAgent):
             "llms.txt": [],
             "ARIA labels": [],
             "WebMCP": [],
-            "Layout Stability": []
+            "Layout Stability": [],
+            "GEO Schema Markup": []
         }
         for act in remediation.actions:
             if act.check_id in ("llms-txt-exists", "llms-txt"):
@@ -1072,6 +1172,8 @@ class ReportAgent(BaseAgent):
                 categories["WebMCP"].append(act)
             elif act.check_id == "cumulative-layout-shift":
                 categories["Layout Stability"].append(act)
+            elif act.check_id == "geo-schema-markup":
+                categories["GEO Schema Markup"].append(act)
 
         actions_lines = []
         html_action_rows = []
@@ -1125,6 +1227,23 @@ class ReportAgent(BaseAgent):
             elif cat_name == "Layout Stability":
                 status = "SKIPPED"
                 desc = "Manual review required"
+            elif cat_name == "GEO Schema Markup":
+                modified = any(a.action_taken == "modified" for a in cat_actions)
+                already_present = any(a.action_taken == "skipped_already_present" for a in cat_actions)
+
+                if modified:
+                    status = "MODIFIED"
+                    desc = "Injected JSON-LD schema into head"
+                elif already_present:
+                    status = "SKIPPED"
+                    desc = "JSON-LD schema already present"
+                else:
+                    if any("not auto-fixable" in a.diff_summary for a in cat_actions):
+                        status = "SKIPPED"
+                        desc = "No issues found"
+                    else:
+                        status = "SKIPPED"
+                        desc = "Remote URL (cannot write)" if "remote" in cat_actions[0].diff_summary.lower() else "Skipped"
 
             actions_lines.append(f"  {status:<9} {cat_name:<19} - {desc}")
 
@@ -1225,6 +1344,9 @@ class ReportAgent(BaseAgent):
 
 AGENTIC BROWSING
 {agentic_block}
+
+GEO READINESS
+{geo_block}
 
 ACCESSIBILITY
 {a11y_block}
@@ -1380,6 +1502,102 @@ BENCHMARK
             </tr>
             {panel_row_html}
             """)
+
+        # --- GEO Readiness Table Rows ---
+        geo_rows_html = []
+        geo_findings_list = [f for f in after.findings if f.category == "geo_readiness"]
+        geo_findings_list.sort(key=lambda x: (x.passed if x.applicable else True))
+        
+        geo_names = {
+            "geo-schema-markup": "Custom GEO Schema Markup",
+        }
+        geo_explanations = {
+            "geo-schema-markup": "Verifies structured JSON-LD schema metadata is present to assist search engine RAG systems and LLM citation indexing.",
+        }
+        
+        for f in geo_findings_list:
+            name = geo_names.get(f.check_id, f.check_id)
+            explanation = geo_explanations.get(f.check_id, "")
+            
+            name_esc = html.escape(name)
+            explanation_esc = html.escape(explanation)
+            details_esc = html.escape(f.details)
+            
+            if not f.applicable:
+                status_label = "N/A"
+                row_class = ""
+                row_click_attr = ""
+                explanation_str = f"{explanation_esc} <span class='text-secondary'>(Not applicable to this page)</span>"
+                panel_row_html = ""
+            else:
+                if f.passed:
+                    status_label = "PASS"
+                    row_class = ""
+                    row_click_attr = ""
+                    explanation_str = f"{explanation_esc} <span class='text-good' style='font-weight:500;'>Status: {details_esc}</span>"
+                    panel_row_html = ""
+                else:
+                    status_label = 'FAIL <span class="chevron">▼</span>'
+                    row_class = "fail-row fail-clickable"
+                    row_click_attr = ' onclick="toggleCodeRow(this)"'
+                    explanation_str = f"{explanation_esc} <br><strong class='text-critical'>Issue: {details_esc}</strong>"
+                    panel_row_html = self._build_code_panel_row(f, colspan=3)
+
+            status_pill_class = f"status-{'pass' if status_label.startswith('PASS') else 'fail' if status_label.startswith('FAIL') else 'na'}"
+            
+            geo_rows_html.append(f"""
+            <tr class="{row_class}"{row_click_attr}>
+                <td style="width: 110px;"><span class="status-pill {status_pill_class}">{status_label}</span></td>
+                <td style="width: 250px;"><strong>{name_esc}</strong></td>
+                <td>{explanation_str}</td>
+            </tr>
+            {panel_row_html}
+            """)
+            
+        # --- GEO Comparison Table Rows ---
+        geo_comparison_rows_html = []
+        for f in geo_findings_list:
+            cid = f.check_id
+            check_name = geo_names.get(cid, cid)
+            before_finding = before.finding_for(cid)
+            after_finding = after.finding_for(cid)
+            
+            before_passed = before_finding.passed if before_finding else True
+            after_passed = after_finding.passed if after_finding else True
+            
+            before_status = "N/A" if (before_finding and not before_finding.applicable) else ("PASS" if before_passed else "FAIL")
+            after_status = "N/A" if (after_finding and not after_finding.applicable) else ("PASS" if after_passed else "FAIL")
+            
+            delta = compute_delta(before_passed, after_passed)
+            
+            if delta == "fixed":
+                badge_class = "badge-fixed"
+                badge_text = "FIXED"
+            elif delta == "regressed":
+                badge_class = "badge-regressed"
+                badge_text = "REGRESSED"
+            else:
+                if before_finding and after_finding and before_finding.raw_score is not None and after_finding.raw_score is not None and after_finding.raw_score > before_finding.raw_score:
+                    badge_class = "badge-improved"
+                    badge_text = "IMPROVED"
+                else:
+                    badge_class = "badge-unchanged"
+                    badge_text = "UNCHANGED"
+                    
+            check_name_esc = html.escape(check_name)
+            geo_comparison_rows_html.append(f"""
+            <tr>
+                <td><strong>{check_name_esc}</strong></td>
+                <td><span class="status-pill status-{'pass' if before_status == 'PASS' else 'fail' if before_status == 'FAIL' else 'na'}">{before_status}</span></td>
+                <td><span class="status-pill status-{'pass' if after_status == 'PASS' else 'fail' if after_status == 'FAIL' else 'na'}">{after_status}</span></td>
+                <td><span class="badge {badge_class}">{badge_text}</span></td>
+            </tr>
+            """)
+
+        geo_findings = [f for f in after.findings if f.category == "geo_readiness"]
+        geo_applicable = [f for f in geo_findings if f.applicable]
+        geo_failed_cnt = sum(1 for f in geo_applicable if not f.passed)
+        geo_passed_cnt = sum(1 for f in geo_applicable if f.passed)
 
         # --- Accessibility Table Rows ---
         A11Y_MAP = {
@@ -2192,6 +2410,46 @@ BENCHMARK
                 </thead>
                 <tbody>
                     {"".join(agentic_rows_html)}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 3b. GEO Readiness Section -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>GEO Readiness</span>
+                    <span class="section-badge">{geo_failed_cnt} failed, {geo_passed_cnt} passed</span>
+                </div>
+                <div class="card-subtitle">Optimizes structured schema metadata for Generative Engine Optimization (GEO) and search RAG extraction.</div>
+            </div>
+            
+            <h4 style="margin: 0 0 10px 0; color: #0f172a; font-size: 14px; font-weight: 600;">Before / After Comparison</h4>
+            <table style="margin-bottom: 24px;">
+                <thead>
+                    <tr>
+                        <th>Check</th>
+                        <th>Before</th>
+                        <th>After</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {"".join(geo_comparison_rows_html)}
+                </tbody>
+            </table>
+
+            <h4 style="margin: 0 0 10px 0; color: #0f172a; font-size: 14px; font-weight: 600;">Audit Details</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Check</th>
+                        <th>What It Means</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {"".join(geo_rows_html)}
                 </tbody>
             </table>
         </div>

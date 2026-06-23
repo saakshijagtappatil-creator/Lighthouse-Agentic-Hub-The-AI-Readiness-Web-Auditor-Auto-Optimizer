@@ -76,6 +76,7 @@ RemediationType = Literal[
     "llms_txt",
     "aria_labels",
     "webmcp_suggestion_only",
+    "geo_schema",
     "not_auto_fixable",
 ]
 
@@ -120,6 +121,7 @@ class RemediationDraft(BaseModel):
     llms_txt_content: Optional[str] = Field(default=None, description="Drafted content for llms.txt, or null if not needed.")
     aria_suggestions: list[AriaLabelSuggestion] = Field(default_factory=list, description="List of ARIA label suggestion objects.")
     webmcp_suggestion: Optional[str] = Field(default=None, description="Suggested WebMCP integration code snippet or instructions, or null if not needed.")
+    geo_schema_draft: Optional[str] = Field(default=None, description="Drafted raw JSON-LD schema metadata markup script.")
 
 
 ActionTaken = Literal[
