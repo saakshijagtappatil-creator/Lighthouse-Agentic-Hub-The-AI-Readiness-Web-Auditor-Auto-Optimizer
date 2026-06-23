@@ -1,4 +1,4 @@
-# SPEC: AI Agent Readiness Auditor & Optimizer
+# SPEC: Lighthouse Agentic Hub: The AI-Readiness Web Auditor & Auto-Optimizer
 
 **Track:** Agents for Business
 **Status:** v2 — revised against the REAL installed ADK API after initial

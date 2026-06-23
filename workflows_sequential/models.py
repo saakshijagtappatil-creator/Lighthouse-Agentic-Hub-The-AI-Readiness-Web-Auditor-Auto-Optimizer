@@ -1,5 +1,5 @@
 """
-Shared Pydantic data contracts for the AI Agent Readiness Auditor & Optimizer.
+Shared Pydantic data contracts for the Lighthouse Agentic Hub: The AI-Readiness Web Auditor & Auto-Optimizer.
 
 These are the ONLY types that should cross a node boundary in the ADK
 Workflow graph. No untyped dicts between nodes — see SPEC.md §3.
@@ -39,15 +39,7 @@ CHECK_IDS = (
     "cumulative-layout-shift",
 )
 
-CheckId = Literal[
-    "llms-txt",
-    "llms-txt-exists",
-    "webmcp-form-coverage",
-    "webmcp-registered-tools",
-    "webmcp-schema-validity",
-    "agent-accessibility-tree",
-    "cumulative-layout-shift",
-]
+CheckId = str
 
 
 class LighthouseFinding(BaseModel):
@@ -60,6 +52,9 @@ class LighthouseFinding(BaseModel):
     passed: bool
     raw_score: Optional[float] = None  # 0.0-1.0 where applicable, None for boolean/notApplicable checks
     details: str  # raw Lighthouse explanation, unmodified
+    category: str  # "agentic_browsing", "accessibility", or "performance"
+    failing_nodes: list[dict] = Field(default_factory=list)
+
 
 
 class AuditResult(BaseModel):

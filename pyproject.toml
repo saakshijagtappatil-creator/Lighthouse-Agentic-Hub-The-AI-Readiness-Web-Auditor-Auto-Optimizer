@@ -1,7 +1,7 @@
 [project]
 name = "workflow-sequential"
 version = "0.1.0"
-description = "Basic worflow agent for educational implementation purposes."
+description = "Lighthouse Agentic Hub: The AI-Readiness Web Auditor & Auto-Optimizer"
 authors = [
     { name = "Tommy Wagner", email = "wagnerthomas@google.com" }
 ]
