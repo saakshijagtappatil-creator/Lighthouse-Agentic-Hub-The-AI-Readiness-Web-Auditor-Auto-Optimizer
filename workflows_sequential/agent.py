@@ -2548,7 +2548,7 @@ BENCHMARK
                 filename="report.html",
                 artifact=google.genai.types.Part(
                     inline_data=google.genai.types.Blob(
-                        mime_type="text/html",
+                        mime_type="application/octet-stream",
                         data=report_html_content.encode("utf-8")
                     )
                 )
@@ -2569,8 +2569,37 @@ BENCHMARK
             report_path=report_md_path,
         )
 
+        total_fixed = sum(1 for comp in comparisons if comp.delta == "fixed")
+        geo_comp = next((f for f in after.findings if f.check_id == "geo-schema-markup"), None)
+        geo_before = next((f for f in before.findings if f.check_id == "geo-schema-markup"), None)
+        if geo_before and geo_comp and not geo_before.passed and geo_comp.passed:
+            total_fixed += 1
+
+        fixed_text = "1 issue resolved automatically" if total_fixed == 1 else f"{total_fixed} issues resolved automatically"
+        a11y_text = "1 issue needs attention" if a11y_issues_cnt == 1 else f"{a11y_issues_cnt} issues need attention"
+        perf_text = "1 issue needs attention" if perf_issues_cnt == 1 else f"{perf_issues_cnt} issues need attention"
+
+        if target.source_type == "local_path":
+            target_name = os.path.basename(target.value.rstrip("/\\"))
+        else:
+            target_name = target.value
+
+        summary_message = (
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "  Lighthouse Agentic Hub — Audit Complete\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"  Target:       {target_name}\n"
+            f"  Fixed:        {fixed_text}\n"
+            f"  Accessibility: {a11y_text}\n"
+            f"  Performance:  {perf_text}\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "  Your full interactive report is ready.\n"
+            "  Click report.html above to open it.\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        )
+
         yield _state_event(self.name, ctx, {"final_report": final_report.model_dump()})
-        yield _text_event(self.name, ctx, report_text)
+        yield _text_event(self.name, ctx, summary_message)
 
 
 # ---------------------------------------------------------------------------
