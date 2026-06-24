@@ -88,12 +88,25 @@ Launch the interactive CLI dashboard:
 uv run agents-cli playground
 ```
 
+![CLI Playground Startup](Step2.jpeg)
+
+Once the server starts, open your browser and go to:
+http://127.0.0.1:8080/dev-ui/?app=workflows_sequential
+
+Then in the chat window, type your audit command:
+--path sandbox/luminary-site
+
+or for a live URL (read-only):
+--url https://yoursite.com
+
 ### Local Path Audit & Remediation
 To audit and automatically fix a local web project directory:
 ```bash
 --path sandbox/luminary-site
 ```
 *This will run audits, draft files, inject missing ARIA/GEO attributes, and write the modifications to disk after confirmation.*
+
+![Local Path Audit Setup](Step3.jpeg)
 
 ### Live URL Audit (Read-Only)
 To audit a public web page without making any changes to files:
@@ -108,7 +121,21 @@ Before making any local file writes, `RemediationExecuteAgent` halts Turn 1 and 
 - Modification types (`CREATE` / `INJECT` / `MODIFY`)
 - Change descriptions and impact statements.
 
+![Waiting for Human Response](Waiting%20for%20Human%20response.jpeg)
+
 The runner sets a session state flag `waiting_for_confirmation = True` and exits. The user can type `yes` to apply the fixes or `no` to skip them. If the user submits a new audit target (e.g. `--path` or `--url`) instead, the workflow automatically resets and restarts the audit process.
+
+![Report Generation](Reportgeneration.jpeg)
+
+### Generated Report Output
+
+Here is how the generated audit and remediation report looks:
+
+![Report Page 1](Report1.jpeg)
+![Report Page 2](Report2.jpeg)
+![Report Page 3](Report3.jpeg)
+![Report Page 4](Report4.jpeg)
+![Report Page 5](Report5.jpeg)
 
 ## Demo Site
 We have prepared a sample website inside `sandbox/luminary-site/` (a high-fidelity product portal for the fictional hardware vendor **Luminary**). It contains intentional accessibility, GEO schema, and instructions gaps to showcase the auditor's capabilities.
