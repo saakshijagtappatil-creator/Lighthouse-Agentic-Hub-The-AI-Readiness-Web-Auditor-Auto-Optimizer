@@ -33,6 +33,17 @@ The system performs automated file-writing changes exclusively on local codebase
 | **Accessibility Audits** | WCAG AA color/label issues | **No** *(Diagnosis)* | Lists manual HTML/CSS fixes, prioritized. |
 | **Performance (Vitals)** | Core Web Vitals issues | **No** *(Diagnosis)* | Lists performance optimization recommendations. |
 
+## Course Concepts Demonstrated
+This project demonstrates several advanced patterns from the Google Agent Development Kit (ADK):
+
+| Concept | Implementation Location | Purpose |
+| :--- | :--- | :--- |
+| **SequentialAgent** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L2767-L2778) | Chains multiple custom Python and LLM agents in a strict execution graph. |
+| **LlmAgent** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L535-L541) | Defines LLM steps utilizing system instructions and Pydantic structured output mapping. |
+| **BaseAgent subclassing**| [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L125-L133) | Subclasses `BaseAgent` to build custom deterministic agent nodes. |
+| **Shared State Delta** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L82-L88) | Passes serializable data contracts between agents using SQLite-backed session states. |
+| **SkillToolset** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L614-L616) | Attaches external skill guideline packages to the LLM agent tool calls. |
+
 ## Architecture
 The workflow pipeline executes as a deterministic sequence of 7 ADK agents. Data contracts are Pydantic models passed through invocation state.
 
@@ -225,17 +236,6 @@ Replace /path/to/ai-readiness-v2 with your local clone path.
 Once connected, the tool audit_web_readiness is available to any agent or LLM in your IDE:
 - audit_web_readiness("sandbox/luminary-site") — local audit
 - audit_web_readiness("https://yoursite.com") — live audit
-
-## Course Concepts Demonstrated
-This project demonstrates several advanced patterns from the Google Agent Development Kit (ADK):
-
-| Concept | Implementation Location | Purpose |
-| :--- | :--- | :--- |
-| **SequentialAgent** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L2767-L2778) | Chains multiple custom Python and LLM agents in a strict execution graph. |
-| **LlmAgent** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L535-L541) | Defines LLM steps utilizing system instructions and Pydantic structured output mapping. |
-| **BaseAgent subclassing**| [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L125-L133) | Subclasses `BaseAgent` to build custom deterministic agent nodes. |
-| **Shared State Delta** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L82-L88) | Passes serializable data contracts between agents using SQLite-backed session states. |
-| **SkillToolset** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L614-L616) | Attaches external skill guideline packages to the LLM agent tool calls. |
 
 ## License
 This project is licensed under the MIT License.
