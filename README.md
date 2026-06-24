@@ -140,7 +140,7 @@ Here is how the generated audit and remediation report looks:
 ## Demo Site
 We have prepared a sample website inside `sandbox/luminary-site/` (a high-fidelity product portal for the fictional hardware vendor **Luminary**). It contains intentional accessibility, GEO schema, and instructions gaps to showcase the auditor's capabilities.
 
-To reset the sandbox site back to its baseline broken state (e.g. before recording a demo or running a new audit):
+To reset the sandbox site back to its baseline broken state before running a new audit:
 ```bash
 git checkout sandbox/luminary-site/index.html
 rm -f sandbox/luminary-site/llms.txt
