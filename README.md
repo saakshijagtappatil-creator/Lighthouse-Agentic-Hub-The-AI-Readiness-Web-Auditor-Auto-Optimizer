@@ -2,6 +2,25 @@
 
 Audit any website for AI agent readiness, accessibility, performance, and GEO readiness — then auto-fix what it can.
 
+## 🎯 The Pitch: Problem, Solution & Value
+
+### The Problem
+As the web transitions from human-centric browsing to AI-agent-centric browsing, a critical readiness gap has emerged:
+1. **AI Visibility Gaps:** Most websites lack standard agent instruction files (`llms.txt`) and structured semantic metadata (GEO JSON-LD scripts) required for LLMs and RAG systems to accurately crawl, index, and cite them.
+2. **AI Navigation Gaps:** AI agents (such as WebMCP agents and browser-based bots) frequently get stuck on buttons, links, and forms due to missing accessible names (`aria-label`) and interactive hierarchy structures.
+3. **The Developer Bottleneck:** Manually auditing websites against WCAG/Lighthouse standards and rewriting source code to add GEO schemas, ARIA tags, and LLM instructions is extremely tedious and time-consuming.
+
+### The Solution: Lighthouse Agentic Hub
+Lighthouse Agentic Hub is an autonomous development tool powered by a 7-Agent Google ADK pipeline. It acts as an automated developer assistant that:
+* **Audits Everything:** Performs deep-crawling audits checking accessibility tree attributes, GEO structured schema, `llms.txt` quality, and Core Web Vitals.
+* **Auto-Remediates Safely:** BeautifulSoup4 and AI skills safely draft and inject missing ARIA tags, GEO schemas, and `llms.txt` files directly into local source code.
+* **Guarantees Safety:** Features strict read-only guardrails for public URL scans and a secure **Human-in-the-Loop** confirmation gate before any local codebase writes are committed.
+
+### The Value
+* **Generative Engine Optimization (GEO):** Dramatically boosts your site's indexing, discoverability, and citation rates in LLM-based search engines (like Gemini).
+* **Frictionless Agent Interactions:** Empowers AI browser agents and WebMCP tools to browse your forms, menus, and actions without getting stuck.
+* **Developer Efficiency:** Automates hours of manual compliance work into a single-click, 10-second command-line workflow.
+
 ## What It Does
 Lighthouse Agentic Hub is an autonomous development tool designed to audit websites and local codebases against Google Lighthouse standards, AI agent accessibility, and Generative Engine Optimization (GEO). It automatically diagnoses failures (such as missing instructions files, missing JSON-LD schema, or invalid navigation hierarchies) and writes safe, local fixes directly to the source code. For complex accessibility or performance issues, the tool provides structured diagnostic insights and step-by-step manual remediation instructions for developers.
 
