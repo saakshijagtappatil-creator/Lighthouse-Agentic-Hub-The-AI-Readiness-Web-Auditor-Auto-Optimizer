@@ -88,6 +88,7 @@ Launch the interactive CLI dashboard:
 uv run agents-cli playground
 ```
 
+**Step 2: CLI Playground Startup**
 ![CLI Playground Startup](Step2.jpeg)
 
 Once the server starts, open your browser and go to:
@@ -106,6 +107,7 @@ To audit and automatically fix a local web project directory:
 ```
 *This will run audits, draft files, inject missing ARIA/GEO attributes, and write the modifications to disk after confirmation.*
 
+**Step 3: Local Path Audit Setup**
 ![Local Path Audit Setup](Step3.jpeg)
 
 ### Live URL Audit (Read-Only)
@@ -121,20 +123,31 @@ Before making any local file writes, `RemediationExecuteAgent` halts Turn 1 and 
 - Modification types (`CREATE` / `INJECT` / `MODIFY`)
 - Change descriptions and impact statements.
 
+**Waiting for Human Response:**
 ![Waiting for Human Response](Waiting%20for%20Human%20response.jpeg)
 
 The runner sets a session state flag `waiting_for_confirmation = True` and exits. The user can type `yes` to apply the fixes or `no` to skip them. If the user submits a new audit target (e.g. `--path` or `--url`) instead, the workflow automatically resets and restarts the audit process.
 
+**Report Generation:**
 ![Report Generation](Reportgeneration.jpeg)
 
 ### Generated Report Output
 
 Here is how the generated audit and remediation report looks:
 
+**Report Page 1:**
 ![Report Page 1](Report1.jpeg)
+
+**Report Page 2:**
 ![Report Page 2](Report2.jpeg)
+
+**Report Page 3:**
 ![Report Page 3](Report3.jpeg)
+
+**Report Page 4:**
 ![Report Page 4](Report4.jpeg)
+
+**Report Page 5:**
 ![Report Page 5](Report5.jpeg)
 
 ## Demo Site
