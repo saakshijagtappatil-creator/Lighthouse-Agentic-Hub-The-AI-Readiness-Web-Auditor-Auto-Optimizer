@@ -1,0 +1,9 @@
+# Luminary — Premium Hardware
+
+Luminary creates precision hardware designed to elevate cognitive flow and streamline digital production.
+
+## Navigation
+- [Home](index.html)
+- [Products](#products)
+- [Innovation](#features)
+- [Connect](#connect)

@@ -21,6 +21,15 @@ Lighthouse Agentic Hub is an autonomous development tool powered by a 7-Agent Go
 * **Frictionless Agent Interactions:** Empowers AI browser agents and WebMCP tools to browse your forms, menus, and actions without getting stuck.
 * **Developer Efficiency:** Automates hours of manual compliance work into a single-click, 10-second command-line workflow.
 
+### 📊 Business Impact & KPI Mapping
+
+| Readiness Gap (Failure) | Technical Impact (AI Agents & Crawlers) | Lost Business KPI & Revenue Impact | Tangible Metric |
+| :--- | :--- | :--- | :--- |
+| **Missing `llms.txt` File** | AI crawler bots (Gemini, GPT-Bot) skip deep pages; RAG indexing engines fall back to general site scraping resulting in hallucinations. | **Lost Referral Traffic:** Brand is completely omitted from AI-generated answer summaries, shopping recommendations, and citations. | **~30% drop** in organic discovery and generative search citations. |
+| **Missing JSON-LD Schema (GEO)** | Search engines and RAG retrieval pipelines cannot parse key structured details (price, specs, availability, ratings) from the DOM. | **Zero Rich Snippet Visibility:** Products fail to appear in organic product carousels or structured AI search summaries, driving users to competitor listings. | **Up to 45% decrease** in search click-through rates (CTR). |
+| **Malformed Accessibility Tree (Missing ARIA labels)** | Autonomous AI browser agents and WebMCP tools cannot locate, interpret, or click button element coordinates, getting stuck in loops. | **Abandoned Conversions:** Agentic buyers (purchasing products, booking flights, or submitting leads via bots) abandon the checkout funnel. | **80%+ drop-off** in agentic/automated checkout transactions. |
+| **Poor Core Web Vitals (LCP / CLS)** | Slow page paint delays AI scrapers; layout shifts confuse visual coordinate click maps of browser automation agents. | **Google SEO Rank Penalty:** Lower ranking in classic SERP + immediate human user bounce rate spikes due to slow, shifting interface response. | **10% increase** in user bounce rate for every 1-second delay in LCP. |
+
 ## What It Does
 Lighthouse Agentic Hub is an autonomous development tool designed to audit websites and local codebases against Google Lighthouse standards, AI agent accessibility, and Generative Engine Optimization (GEO). It automatically diagnoses failures (such as missing instructions files, missing JSON-LD schema, or invalid navigation hierarchies) and writes safe, local fixes directly to the source code. For complex accessibility or performance issues, the tool provides structured diagnostic insights and step-by-step manual remediation instructions for developers.
 
