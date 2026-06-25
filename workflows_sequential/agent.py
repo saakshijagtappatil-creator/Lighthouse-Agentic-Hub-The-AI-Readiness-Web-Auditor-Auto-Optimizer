@@ -2068,7 +2068,7 @@ BENCHMARK
             align-items: center;
             border-bottom: 4px solid #6366f1;
         }}
-        .header h1 {{
+        .header .report-title {{
             margin: 0;
             font-size: 24px;
             font-weight: 700;
@@ -2497,7 +2497,7 @@ BENCHMARK
 </head>
 <body>
     <div class="header">
-        <h1>Lighthouse Agentic Hub: The AI-Readiness Web Auditor & Auto-Optimizer</h1>
+        <div class="report-title">Lighthouse Agentic Hub: The AI-Readiness Web Auditor & Auto-Optimizer</div>
         <div class="metadata">
             <div>Target: <strong>{target_display_esc}</strong></div>
             <div>Date: <strong>{timestamp_str}</strong></div>
