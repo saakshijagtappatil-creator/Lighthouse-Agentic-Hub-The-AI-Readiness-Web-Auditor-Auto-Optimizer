@@ -62,15 +62,17 @@ The system performs automated file-writing changes exclusively on local codebase
 | **Performance (Vitals)** | Core Web Vitals issues | **No** *(Diagnosis)* | Lists performance optimization recommendations. |
 
 ## Course Concepts Demonstrated
-This project demonstrates several advanced patterns from the Google Agent Development Kit (ADK):
 
-| Concept | Implementation Location | Purpose |
+This project demonstrates the core concepts required by the Google/Kaggle AI Agents Intensive, implemented using the Google Agent Development Kit (ADK) and FastMCP:
+
+| Course Concept | Implementation Location | Details & Purpose |
 | :--- | :--- | :--- |
-| **SequentialAgent** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L2767-L2778) | Chains multiple custom Python and LLM agents in a strict execution graph. |
-| **LlmAgent** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L535-L541) | Defines LLM steps utilizing system instructions and Pydantic structured output mapping. |
-| **BaseAgent subclassing**| [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L125-L133) | Subclasses `BaseAgent` to build custom deterministic agent nodes. |
-| **Shared State Delta** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L82-L88) | Passes serializable data contracts between agents using SQLite-backed session states. |
-| **SkillToolset** | [workflows_sequential/agent.py](file:///path/to/ai-readiness-v2/workflows_sequential/agent.py#L614-L616) | Attaches external skill guideline packages to the LLM agent tool calls. |
+| **Agent / Multi-Agent System (ADK)** | [workflows_sequential/agent.py](file:///Users/prasadpatil/agy2-projects/ai-readiness-v2/workflows_sequential/agent.py) | Chains a sequence of 7 custom and LLM-based agents using the ADK `SequentialAgent` pipeline. It subclasses `BaseAgent` for deterministic nodes and uses `LlmAgent` for Gemini structured outputs. |
+| **MCP Server** | [workflows_sequential/mcp_server.py](file:///Users/prasadpatil/agy2-projects/ai-readiness-v2/workflows_sequential/mcp_server.py) | Implements a FastMCP server that exposes the `audit_web_readiness` tool to any external IDE agent or client. |
+| **Antigravity** | Workspace / Playground sessions | Built using pair programming prompts, playground debugging sessions, and interactive CLI runner executions. |
+| **Security Features** | [workflows_sequential/mcp_server.py](file:///Users/prasadpatil/agy2-projects/ai-readiness-v2/workflows_sequential/mcp_server.py#L45-L67)<br>[workflows_sequential/agent.py](file:///Users/prasadpatil/agy2-projects/ai-readiness-v2/workflows_sequential/agent.py) | **Two layers of security:**<br>1. MCP Path Traversal Guards (`os.path.realpath` + `os.sep` checks) and URL validation.<br>2. Read-only URL execution limits and Human-in-the-Loop confirmation gates before local file writes. |
+| **Deployability** | [Dockerfile](file:///Users/prasadpatil/agy2-projects/ai-readiness-v2/Dockerfile) | Configures a containerized runtime environment containing Python 3.12, Node, Google Chrome, and Lighthouse CLI for clean, portable execution. |
+| **Agent Skills (Agents CLI & Custom Skills)** | [workflows_sequential/agent.py](file:///Users/prasadpatil/agy2-projects/ai-readiness-v2/workflows_sequential/agent.py#L614-L616) | Integrates with `agents-cli` for orchestration, passes state using SQLite-backed **Shared State Deltas**, and attaches a custom **SkillToolset** for the `llms-txt-drafting` task. |
 
 ## Architecture
 The workflow pipeline executes as a deterministic sequence of 7 ADK agents. Data contracts are Pydantic models passed through invocation state.
