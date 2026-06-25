@@ -51,11 +51,11 @@ async def audit_web_readiness(target: str) -> str:
         except Exception as e:
             raise ValueError(f"Security Error: Invalid URL target: {e}")
     else:
-        abs_target = os.path.abspath(target)
+        abs_target = os.path.realpath(target)
         workspace_root = os.path.abspath(os.getcwd())
         
         # Enforce that the directory lies inside the workspace
-        if not abs_target.startswith(workspace_root):
+        if not (abs_target == workspace_root or abs_target.startswith(workspace_root + os.sep)):
             raise ValueError(
                 f"Security Error: Audit target path '{target}' lies outside the permitted workspace root: '{workspace_root}'"
             )
