@@ -1451,10 +1451,10 @@ class ReportAgent(BaseAgent):
 
             html_table_rows.append(f"""
             <tr>
-                <td><strong>{comp.check_id}</strong></td>
-                <td>{before_status}</td>
-                <td>{after_status}</td>
-                <td><span class="delta-badge {delta_class}">{delta_label}</span></td>
+                <td style="width: 40%;"><strong>{comp.check_id}</strong></td>
+                <td style="width: 20%;">{before_status}</td>
+                <td style="width: 20%;">{after_status}</td>
+                <td style="width: 20%;"><span class="delta-badge {delta_class}">{delta_label}</span></td>
             </tr>
             """)
 
@@ -1466,10 +1466,10 @@ class ReportAgent(BaseAgent):
         <table class="comparison-table">
             <thead>
                 <tr>
-                    <th>Check ID</th>
-                    <th>Before</th>
-                    <th>After</th>
-                    <th>Delta</th>
+                    <th style="width: 40%;">Check ID</th>
+                    <th style="width: 20%;">Before</th>
+                    <th style="width: 20%;">After</th>
+                    <th style="width: 20%;">Delta</th>
                 </tr>
             </thead>
             <tbody>
@@ -1594,10 +1594,10 @@ BENCHMARK
             check_name_esc = html.escape(check_name)
             remediation_rows_html.append(f"""
             <tr>
-                <td><strong>{check_name_esc}</strong></td>
-                <td><span class="status-pill status-{'pass' if before_status == 'PASS' else 'fail' if before_status == 'FAIL' else 'na'}">{before_status}</span></td>
-                <td><span class="status-pill status-{'pass' if after_status == 'PASS' else 'fail' if after_status == 'FAIL' else 'na'}">{after_status}</span></td>
-                <td><span class="badge {badge_class}">{badge_text}</span></td>
+                <td style="width: 40%;"><strong>{check_name_esc}</strong></td>
+                <td style="width: 20%;"><span class="status-pill status-{'pass' if before_status == 'PASS' else 'fail' if before_status == 'FAIL' else 'na'}">{before_status}</span></td>
+                <td style="width: 20%;"><span class="status-pill status-{'pass' if after_status == 'PASS' else 'fail' if after_status == 'FAIL' else 'na'}">{after_status}</span></td>
+                <td style="width: 20%;"><span class="badge {badge_class}">{badge_text}</span></td>
             </tr>
             """)
 
@@ -1648,7 +1648,7 @@ BENCHMARK
             
             agentic_rows_html.append(f"""
             <tr class="{row_class}"{row_click_attr}>
-                <td style="width: 110px;"><span class="status-pill {status_pill_class}">{status_label}</span></td>
+                <td style="width: 120px;"><span class="status-pill {status_pill_class}">{status_label}</span></td>
                 <td style="width: 250px;"><strong>{name_esc}</strong></td>
                 <td>{explanation_str}</td>
             </tr>
@@ -1699,7 +1699,7 @@ BENCHMARK
             
             geo_rows_html.append(f"""
             <tr class="{row_class}"{row_click_attr}>
-                <td style="width: 110px;"><span class="status-pill {status_pill_class}">{status_label}</span></td>
+                <td style="width: 120px;"><span class="status-pill {status_pill_class}">{status_label}</span></td>
                 <td style="width: 250px;"><strong>{name_esc}</strong></td>
                 <td>{explanation_str}</td>
             </tr>
@@ -1739,10 +1739,10 @@ BENCHMARK
             check_name_esc = html.escape(check_name)
             geo_comparison_rows_html.append(f"""
             <tr>
-                <td><strong>{check_name_esc}</strong></td>
-                <td><span class="status-pill status-{'pass' if before_status == 'PASS' else 'fail' if before_status == 'FAIL' else 'na'}">{before_status}</span></td>
-                <td><span class="status-pill status-{'pass' if after_status == 'PASS' else 'fail' if after_status == 'FAIL' else 'na'}">{after_status}</span></td>
-                <td><span class="badge {badge_class}">{badge_text}</span></td>
+                <td style="width: 40%;"><strong>{check_name_esc}</strong></td>
+                <td style="width: 20%;"><span class="status-pill status-{'pass' if before_status == 'PASS' else 'fail' if before_status == 'FAIL' else 'na'}">{before_status}</span></td>
+                <td style="width: 20%;"><span class="status-pill status-{'pass' if after_status == 'PASS' else 'fail' if after_status == 'FAIL' else 'na'}">{after_status}</span></td>
+                <td style="width: 20%;"><span class="badge {badge_class}">{badge_text}</span></td>
             </tr>
             """)
 
@@ -1824,7 +1824,7 @@ BENCHMARK
             panel_row_html = self._build_code_panel_row(f, colspan=4)
             a11y_failed_rows_html.append(f"""
             <tr class="fail-row fail-clickable" onclick="toggleCodeRow(this)">
-                <td style="width: 100px;"><span class="priority-pill {pill_class}">{priority} <span class="chevron">▼</span></span></td>
+                <td style="width: 120px;"><span class="priority-pill {pill_class}">{priority} <span class="chevron">▼</span></span></td>
                 <td style="width: 250px;"><strong>{name_esc}</strong></td>
                 <td>{full_desc}</td>
                 <td>{fix_esc}</td>
@@ -1842,7 +1842,7 @@ BENCHMARK
             
             a11y_passed_rows_html.append(f"""
             <tr>
-                <td style="width: 100px;"><span class="status-pill status-pass">PASS</span></td>
+                <td style="width: 120px;"><span class="status-pill status-pass">PASS</span></td>
                 <td style="width: 250px;"><strong>{name_esc}</strong></td>
                 <td>{explanation_esc}</td>
             </tr>
@@ -1867,10 +1867,10 @@ BENCHMARK
             if not f:
                 vitals_rows_html.append(f"""
                 <tr>
-                    <td><strong>{title_esc}</strong></td>
-                    <td><span class="status-pill status-na">N/A</span></td>
-                    <td>N/A</td>
-                    <td>{target_val_esc}</td>
+                    <td style="width: 250px;"><strong>{title_esc}</strong></td>
+                    <td style="width: 150px;"><span class="status-pill status-na">N/A</span></td>
+                    <td style="width: 120px;">N/A</td>
+                    <td style="width: 100px;">{target_val_esc}</td>
                     <td>{desc_esc}</td>
                 </tr>
                 """)
@@ -1911,10 +1911,10 @@ BENCHMARK
 
             vitals_rows_html.append(f"""
             <tr class="{row_class}"{row_click_attr}>
-                <td><strong>{title_esc}</strong></td>
-                <td><span class="metric-status {status_class}">{status_lbl}{chevron}</span></td>
-                <td>{display_val_esc}</td>
-                <td>{target_val_esc}</td>
+                <td style="width: 250px;"><strong>{title_esc}</strong></td>
+                <td style="width: 150px;"><span class="metric-status {status_class}">{status_lbl}{chevron}</span></td>
+                <td style="width: 120px;">{display_val_esc}</td>
+                <td style="width: 100px;">{target_val_esc}</td>
                 <td>{desc_esc}</td>
             </tr>
             {panel_row_html}
@@ -1923,10 +1923,10 @@ BENCHMARK
         # Add INP (Interaction to Next Paint) synthetic row
         vitals_rows_html.append(f"""
         <tr>
-            <td><strong>Interaction to Next Paint (INP)</strong></td>
-            <td><span class="metric-status metric-good">Good</span></td>
-            <td>N/A (No user interactions)</td>
-            <td>&lt; 200ms</td>
+            <td style="width: 250px;"><strong>Interaction to Next Paint (INP)</strong></td>
+            <td style="width: 150px;"><span class="metric-status metric-good">Good</span></td>
+            <td style="width: 120px;">N/A (No user interactions)</td>
+            <td style="width: 100px;">&lt; 200ms</td>
             <td>User interaction delay</td>
         </tr>
         """)
@@ -2003,9 +2003,9 @@ BENCHMARK
             panel_row_html = self._build_code_panel_row(f, colspan=4)
             opp_rows_html.append(f"""
             <tr class="fail-row fail-clickable" onclick="toggleCodeRow(this)">
-                <td style="width: 100px;"><span class="priority-pill {pill_class}">{priority} <span class="chevron">▼</span></span></td>
+                <td style="width: 120px;"><span class="priority-pill {pill_class}">{priority} <span class="chevron">▼</span></span></td>
                 <td style="width: 250px;"><strong>{name_esc}</strong></td>
-                <td><strong class="text-info">{savings_esc}</strong></td>
+                <td style="width: 150px;"><strong class="text-info">{savings_esc}</strong></td>
                 <td>{fix_esc} <br><small class='text-secondary' style='margin-top: 4px; display: block;'>Lighthouse details: {details_esc}</small></td>
             </tr>
             {panel_row_html}
@@ -2171,12 +2171,13 @@ BENCHMARK
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #e2e8f0;
+            table-layout: fixed;
         }}
         th {{
             background-color: #f8fafc;
             color: #64748b;
             font-weight: 600;
-            text-align: left;
+            text-align: left !important;
             padding: 12px 16px;
             border-bottom: 1px solid #e2e8f0;
         }}
@@ -2184,6 +2185,9 @@ BENCHMARK
             padding: 14px 16px;
             border-bottom: 1px solid #e2e8f0;
             vertical-align: top;
+            text-align: left !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }}
         tr:last-child td {{
             border-bottom: none;
@@ -2191,8 +2195,11 @@ BENCHMARK
         tr.fail-row td {{
             background-color: #fef2f2;
         }}
-        tr.fail-row {{
-            border-left: 4px solid #dc2626;
+        th:first-child, td:first-child {{
+            border-left: 4px solid transparent;
+        }}
+        tr.fail-row td:first-child {{
+            border-left: 4px solid #dc2626 !important;
         }}
         .status-pill {{
             font-size: 11px;
@@ -2528,10 +2535,10 @@ BENCHMARK
             <table>
                 <thead>
                     <tr>
-                        <th>Check</th>
-                        <th>Before</th>
-                        <th>After</th>
-                        <th>Result</th>
+                        <th style="width: 40%;">Check</th>
+                        <th style="width: 20%;">Before</th>
+                        <th style="width: 20%;">After</th>
+                        <th style="width: 20%;">Result</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2555,8 +2562,8 @@ BENCHMARK
             <table>
                 <thead>
                     <tr>
-                        <th>Status</th>
-                        <th>Check</th>
+                        <th style="width: 120px;">Status</th>
+                        <th style="width: 250px;">Check</th>
                         <th>What It Means</th>
                     </tr>
                 </thead>
@@ -2580,10 +2587,10 @@ BENCHMARK
             <table style="margin-bottom: 24px;">
                 <thead>
                     <tr>
-                        <th>Check</th>
-                        <th>Before</th>
-                        <th>After</th>
-                        <th>Result</th>
+                        <th style="width: 40%;">Check</th>
+                        <th style="width: 20%;">Before</th>
+                        <th style="width: 20%;">After</th>
+                        <th style="width: 20%;">Result</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2595,8 +2602,8 @@ BENCHMARK
             <table>
                 <thead>
                     <tr>
-                        <th>Status</th>
-                        <th>Check</th>
+                        <th style="width: 120px;">Status</th>
+                        <th style="width: 250px;">Check</th>
                         <th>What It Means</th>
                     </tr>
                 </thead>
@@ -2616,7 +2623,7 @@ BENCHMARK
                 <div class="card-subtitle">Checks for standard WCAG compliance and keyboard controls to make page content navigable.</div>
             </div>
             
-            {f'<table><thead><tr><th>Priority</th><th>Issue</th><th>What It Means</th><th>Suggested Fix</th></tr></thead><tbody>{"".join(a11y_failed_rows_html)}</tbody></table>' if a11y_failed_rows_html else '<p class="text-good" style="font-weight:600; margin: 0 0 12px 0;">No accessibility issues detected.</p>'}
+            {f'<table><thead><tr><th style="width: 120px;">Priority</th><th style="width: 250px;">Issue</th><th style="width: 30%;">What It Means</th><th>Suggested Fix</th></tr></thead><tbody>{"".join(a11y_failed_rows_html)}</tbody></table>' if a11y_failed_rows_html else '<p class="text-good" style="font-weight:600; margin: 0 0 12px 0;">No accessibility issues detected.</p>'}
             
             {f'<div class="text-secondary" style="font-size: 13px; margin-top: 12px;">{a11y_not_applicable_cnt} checks not applicable to this site (no relevant elements found)</div>' if a11y_not_applicable_cnt > 0 else ''}
             
@@ -2627,8 +2634,8 @@ BENCHMARK
                 <table>
                     <thead>
                         <tr>
-                            <th>Status</th>
-                            <th>Check</th>
+                            <th style="width: 120px;">Status</th>
+                            <th style="width: 250px;">Check</th>
                             <th>What It Means</th>
                         </tr>
                     </thead>
@@ -2655,10 +2662,10 @@ BENCHMARK
             <table style="margin-bottom: 24px;">
                 <thead>
                     <tr>
-                        <th>Metric</th>
-                        <th>Status</th>
-                        <th>Your Score</th>
-                        <th>Target</th>
+                        <th style="width: 250px;">Metric</th>
+                        <th style="width: 150px;">Status</th>
+                        <th style="width: 120px;">Your Score</th>
+                        <th style="width: 100px;">Target</th>
                         <th>What It Means</th>
                     </tr>
                 </thead>
@@ -2669,7 +2676,7 @@ BENCHMARK
 
             <!-- Opportunities sub-table -->
             <h4 style="margin: 0 0 10px 0; color: #0f172a; font-size: 14px; font-weight: 600;">Opportunities to Improve</h4>
-            {f'<table><thead><tr><th>Priority</th><th>Opportunity</th><th>Estimated Savings</th><th>How to Fix</th></tr></thead><tbody>{"".join(opp_rows_html)}</tbody></table>' if opp_rows_html else '<p class="text-good" style="font-weight:600; margin: 0;">All core asset size and caching optimization targets met.</p>'}
+            {f'<table><thead><tr><th style="width: 120px;">Priority</th><th style="width: 250px;">Opportunity</th><th style="width: 150px;">Estimated Savings</th><th>How to Fix</th></tr></thead><tbody>{"".join(opp_rows_html)}</tbody></table>' if opp_rows_html else '<p class="text-good" style="font-weight:600; margin: 0;">All core asset size and caching optimization targets met.</p>'}
         </div>
 
         <!-- 6. Next Steps / Manual Action Required -->
