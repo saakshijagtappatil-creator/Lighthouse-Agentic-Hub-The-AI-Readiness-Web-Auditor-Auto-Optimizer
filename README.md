@@ -284,5 +284,29 @@ Once connected, the tool `audit_web_readiness` is available to any agent or LLM 
 - `audit_web_readiness("sandbox/luminary-site")` — local audit
 - `audit_web_readiness("https://yoursite.com")` — live audit
 
+## Known Limitations
+
+**BeautifulSoup4 HTML Formatting**
+The ARIA label injection uses BeautifulSoup4 to parse and 
+modify HTML files. While safe and effective for clean HTML, 
+BS4 reformats the entire document on output — this may 
+strip inline comments, normalize tag casing, and reset 
+custom indentation.
+
+This is acceptable for the sandbox demo site but a 
+production-grade implementation would use a line-by-line 
+diff patcher or AST-based parser to preserve the original 
+file formatting. This is a planned improvement in Phase 2.
+
+**Lighthouse CLI Dependency**
+The audit pipeline requires Google Lighthouse CLI and 
+Chromium installed locally. This means the tool cannot 
+run in sandboxed environments like Kaggle notebooks or 
+serverless functions without additional configuration.
+
+**Single-page Audit**
+The current implementation audits one page at a time. 
+Multi-page site crawling is a planned Phase 2 feature.
+
 ## License
 This project is licensed under the MIT License.
