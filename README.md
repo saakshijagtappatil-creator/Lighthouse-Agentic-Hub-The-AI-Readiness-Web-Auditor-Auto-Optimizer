@@ -310,5 +310,17 @@ serverless functions without additional configuration.
 The current implementation audits one page at a time. 
 Multi-page site crawling is a planned Phase 2 feature.
 
+## 🔮 Future Work
+
+| Phase | Planned Feature | Purpose |
+| :--- | :--- | :--- |
+| **Phase 2** | `DRY_RUN` preview mode | AST-based patch previews replace BeautifulSoup4 rewrites, preserving original formatting and inline comments. |
+| **Phase 2** | Multi-page site crawling | Full sitemap crawling with per-page and aggregate readiness scores. |
+| **Phase 2** | GEO visible text optimization | `LlmAgent` rewrites on-page copy for improved RAG citation accuracy in LLM-based search engines. |
+| **Phase 2** | Expanded accessibility auto-fixes | Auto-inject semantic landmark tags and skip-navigation links for full WCAG AA structural compliance. |
+| **Phase 3** | Agent-to-Agent (A2A) protocol integration | Expose the audit pipeline as an A2A-compatible endpoint for cross-framework agent orchestration. |
+| **Phase 3** | CI/CD integration | GitHub Actions workflow that runs the auditor on every PR — blocks merges if AI readiness score drops below a configurable threshold. |
+| **Phase 3** | Audit trend tracking | Persistent score history per domain with regression alerts — transforms one-off audits into continuous AI readiness monitoring. |
+
 ## License
 This project is licensed under the MIT License.
