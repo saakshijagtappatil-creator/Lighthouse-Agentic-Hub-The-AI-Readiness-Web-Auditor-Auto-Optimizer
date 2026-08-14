@@ -244,6 +244,40 @@ This project implements multiple layers of security:
 - Command Injection Prevention: All subprocesses use shell=False with clean argument lists — shell metacharacters in inputs cannot execute arbitrary commands.
 - Read-Only Enforcement: The MCP server only exposes the audit_web_readiness tool. No file writing or remediation capabilities are exposed through the MCP interface.
 
+## Test Suite
+
+The project includes 18 automated tests across three layers:
+
+### Unit Tests
+| Test File | What It Tests |
+|---|---|
+| test_dummy.py | Basic import and environment sanity check |
+| test_mcp_server.py | Path traversal guard, URL scheme validation, workspace boundary check |
+| test_remediation_agent.py | JSON-LD injection, ARIA label patching, edge cases, user rejection |
+| test_report_agent.py | HTML/MD report generation, path leak prevention |
+
+### Integration Tests
+| Test File | What It Tests |
+|---|---|
+| test_agent.py | Full 7-agent pipeline state passing |
+| test_agent_live.py | Live end-to-end with real Gemini API + Lighthouse CLI (skips if no API key) |
+| test_confirmation.py | Human-in-the-loop: yes flow, no flow, mid-session reset |
+| test_server_e2e.py | HTTP server streaming, error handling, feedback collection |
+
+### Run Tests
+
+Run the full test suite:
+uv run pytest tests/unit tests/integration -v
+
+Run unit tests only (no API key needed):
+uv run pytest tests/unit -v
+
+Run live integration test (requires GEMINI_API_KEY):
+uv run pytest tests/integration/test_agent_live.py -v
+
+All 18 tests pass in approximately 60 seconds on a 
+standard development machine.
+
 ## Connect via MCP
 
 Any MCP-compatible IDE (Claude Desktop, Cursor, Windsurf) can connect to the Lighthouse Agentic Hub auditor directly.
