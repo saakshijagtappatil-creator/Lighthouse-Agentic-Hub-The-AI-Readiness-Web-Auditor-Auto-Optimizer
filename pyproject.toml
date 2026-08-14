@@ -17,9 +17,19 @@ dependencies = [
     "mcp>=1.2.0,<2.0.0",
 ]
 
+[project.optional-dependencies]
+eval = [
+    "google-cloud-aiplatform[evaluation]>=1.100.0,<2.0.0",
+]
+
+
+
 [dependency-groups]
 dev = [
     "google-adk>=1.5.0,<2.0.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio",
+    "anyio",
 ]
 deployment = [
     "absl-py>=2.2.2",
