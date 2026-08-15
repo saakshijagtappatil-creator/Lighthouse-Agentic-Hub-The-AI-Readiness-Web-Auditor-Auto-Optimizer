@@ -280,6 +280,42 @@ uv run pytest tests/integration/test_agent_live.py -v
 All 18 tests pass in approximately 60 seconds on a 
 standard development machine.
 
+### Eval Suite (LLM-as-a-Judge)
+
+The project includes a custom pytest-based evaluation suite that measures LLM output quality using Gemini as an automated judge.
+
+**Latest Results (August 2026):**
+- 9/9 deterministic cases: Passed
+- 22/23 LLM quality cases: Score 5/5
+- 1 edge case (HITL gate): Score 1/5 (expected — pipeline correctly pauses waiting for human confirmation)
+- Overall quality score: 95.6%
+
+**Run the eval suite:**
+uv run pytest tests/eval/test_eval_quality.py -v -s
+
+**Eval datasets:**
+- tests/eval/datasets/basic-dataset.json — intake, audit, remediation execution
+- tests/eval/datasets/diagnosis-quality.json — DiagnosisAgent LLM mapping accuracy
+- tests/eval/datasets/remediation-quality.json — RemediationDraftAgent output quality
+
+Results are saved to tests/eval/results/latest_results.md
+
+Note: agents-cli eval generate is incompatible with dynamic instruction functions. We use custom pytest evals instead — this gives full control and evaluates real production code directly.
+
+## CI/CD
+
+Every push to main automatically runs the unit test suite via GitHub Actions.
+
+The workflow:
+- Triggers on push and pull request to main
+- Sets up Python 3.13 and uv
+- Installs all dependencies
+- Runs uv run pytest tests/unit -v
+- Completes in under 30 seconds
+
+View workflow runs:
+https://github.com/saakshijagtappatil-creator/Lighthouse-Agentic-Hub-The-AI-Readiness-Web-Auditor-Auto-Optimizer/actions
+
 ## Connect via MCP
 
 Any MCP-compatible IDE (Claude Desktop, Cursor, Windsurf) can connect to the Lighthouse Agentic Hub auditor directly.
