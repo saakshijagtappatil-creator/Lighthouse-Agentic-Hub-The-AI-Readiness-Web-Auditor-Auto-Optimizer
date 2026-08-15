@@ -171,7 +171,7 @@ def test_eval_case(case):
             
             client = Client()
             response = client.models.generate_content(
-                model="gemini-2.0-flash-lite",
+                model="gemini-3.1-flash-lite",
                 contents=judge_prompt,
                 config=genai_types.GenerateContentConfig(
                     response_mime_type="application/json",
