@@ -1,9 +1,9 @@
-# Luminary — Premium Hardware
+# Luminary Premium Hardware
 
-Luminary creates precision hardware designed to elevate cognitive flow and streamline digital production.
+Luminary creates high-end digital production hardware engineered for precision workflow control, focusing on minimalist design and high-performance materials.
 
-## Navigation
-- [Home](index.html)
-- [Products](#products)
-- [Innovation](#features)
-- [Connect](#connect)
+## Key Sections
+- [Home Page](index.html)
+- [Products](#products): Overview of our ecosystem including Horizon Display, Keyframe Core, and Acoustic Bar.
+- [Innovation](#features): Details on our design philosophy, materials (Titanium Alloy), and engineering breakthroughs.
+- [Connect](#connect): Newsletter and allocation sign-up for product releases and custom configurations.

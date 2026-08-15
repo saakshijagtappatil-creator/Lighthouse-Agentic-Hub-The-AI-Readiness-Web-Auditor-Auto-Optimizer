@@ -1,5 +1,7 @@
 # Lighthouse Agentic Hub: The AI-Readiness Web Auditor & Auto-Optimizer
 
+[![CI](https://github.com/saakshijagtappatil-creator/Lighthouse-Agentic-Hub-The-AI-Readiness-Web-Auditor-Auto-Optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/saakshijagtappatil-creator/Lighthouse-Agentic-Hub-The-AI-Readiness-Web-Auditor-Auto-Optimizer/actions/workflows/ci.yml)
+
 Audit any website for AI agent readiness, accessibility, performance, and GEO readiness — then auto-fix what it can.
 
 ## 🎯 The Pitch: Problem, Solution & Value
