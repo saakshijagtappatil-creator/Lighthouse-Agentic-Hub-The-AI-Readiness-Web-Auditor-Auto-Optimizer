@@ -1,27 +1,174 @@
 {
   "eval_cases": [
     {
-      "eval_case_id": "local_path_audit",
+      "eval_case_id": "intake_valid_path",
       "prompt": {
         "role": "user",
-        "parts": [
+        "parts": [{"text": "--path ./sandbox/luminary-site"}]
+      }
+    },
+    {
+      "eval_case_id": "intake_valid_url",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--url https://example.com"}]
+      }
+    },
+    {
+      "eval_case_id": "intake_invalid_path",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--path ./nonexistent_directory"}]
+      }
+    },
+    {
+      "eval_case_id": "intake_path_traversal",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--path /etc"}]
+      }
+    },
+    {
+      "eval_case_id": "audit_missing_llms_txt",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--path ./sandbox/luminary-site"}]
+      }
+    },
+    {
+      "eval_case_id": "audit_with_llms_txt",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--path ./sandbox/luminary-site"}]
+      }
+    },
+    {
+      "eval_case_id": "remediation_execute_approved",
+      "agent_data": {
+        "turns": [
           {
-            "text": "--path ./sandbox/luminary-site"
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "role": "user",
+                  "parts": [{"text": "--path ./sandbox/luminary-site"}]
+                }
+              },
+              {
+                "author": "remediation_execute_agent",
+                "content": {
+                  "role": "model",
+                  "parts": [{"text": "PROPOSED CHANGES"}]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "role": "user",
+                  "parts": [{"text": "yes"}]
+                }
+              }
+            ]
           }
         ]
       }
     },
     {
-      "eval_case_id": "remote_url_audit",
-      "prompt": {
-        "role": "user",
-        "parts": [
+      "eval_case_id": "remediation_execute_rejected",
+      "agent_data": {
+        "turns": [
           {
-            "text": "--url https://example.com"
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "role": "user",
+                  "parts": [{"text": "--path ./sandbox/luminary-site"}]
+                }
+              },
+              {
+                "author": "remediation_execute_agent",
+                "content": {
+                  "role": "model",
+                  "parts": [{"text": "PROPOSED CHANGES"}]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "role": "user",
+                  "parts": [{"text": "no"}]
+                }
+              }
+            ]
           }
         ]
+      }
+    },
+    {
+      "eval_case_id": "remediation_execute_url_skipped",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "role": "user",
+                  "parts": [{"text": "--url https://example.com"}]
+                }
+              },
+              {
+                "author": "remediation_execute_agent",
+                "content": {
+                  "role": "model",
+                  "parts": [{"text": "PROPOSED CHANGES"}]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "role": "user",
+                  "parts": [{"text": "yes"}]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "e2e_luminary_site",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--path ./sandbox/luminary-site"}]
+      }
+    },
+    {
+      "eval_case_id": "e2e_live_url",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "--url https://example.com"}]
       }
     }
   ]
 }
-

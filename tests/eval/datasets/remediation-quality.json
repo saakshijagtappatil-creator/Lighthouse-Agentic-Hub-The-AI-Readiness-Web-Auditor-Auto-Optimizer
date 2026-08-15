@@ -1,0 +1,100 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "remediation_draft_llms_txt",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: llms-txt-exists check failed."}]}
+              },
+              {
+                "author": "diagnosis_agent",
+                "content": {"role": "model", "parts": [{"text": "Diagnosis: llms_txt remediation required."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "remediation_draft_geo_schema",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: geo-schema-markup check failed."}]}
+              },
+              {
+                "author": "diagnosis_agent",
+                "content": {"role": "model", "parts": [{"text": "Diagnosis: geo_schema remediation required."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "remediation_draft_aria_labels",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: agent-accessibility-tree check failed."}]}
+              },
+              {
+                "author": "diagnosis_agent",
+                "content": {"role": "model", "parts": [{"text": "Diagnosis: aria_labels remediation required."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "remediation_draft_path_safety",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: agent-accessibility-tree check failed."}]}
+              },
+              {
+                "author": "diagnosis_agent",
+                "content": {"role": "model", "parts": [{"text": "Diagnosis: aria_labels remediation required."}]}
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "diagnosis_missing_llms_txt",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: llms-txt-exists check failed."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_missing_geo_schema",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: geo-schema-markup check failed."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_missing_aria_labels",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: agent-accessibility-tree check failed."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_webmcp_coverage",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: webmcp-form-coverage check failed."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_layout_stability",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: cumulative-layout-shift check failed."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_no_remediation_needed_1",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. All checks passed successfully."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_no_remediation_needed_2",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Accessibility tree validated successfully."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "diagnosis_mixed_findings",
+      "agent_data": {
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"role": "user", "parts": [{"text": "--path ./sandbox/luminary-site"}]}
+              },
+              {
+                "author": "AuditAgent",
+                "content": {"role": "model", "parts": [{"text": "Audit complete. Findings: geo-schema-markup failed, color-contrast failed."}]}
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
