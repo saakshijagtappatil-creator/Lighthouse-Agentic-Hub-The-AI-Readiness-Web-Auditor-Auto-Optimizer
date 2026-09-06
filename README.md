@@ -248,7 +248,7 @@ This project implements multiple layers of security:
 
 ## Test Suite
 
-The project includes 18 automated tests across three layers:
+The project includes 19 automated tests across three layers:
 
 ### Unit Tests
 | Test File | What It Tests |
@@ -277,7 +277,7 @@ uv run pytest tests/unit -v
 Run live integration test (requires GEMINI_API_KEY):
 uv run pytest tests/integration/test_agent_live.py -v
 
-All 18 tests pass in approximately 60 seconds on a 
+All 19 tests pass in approximately 60 seconds on a 
 standard development machine.
 
 ### Eval Suite (LLM-as-a-Judge)
@@ -288,7 +288,8 @@ The project includes a custom pytest-based evaluation suite that measures LLM ou
 - 9/9 deterministic cases: Passed
 - 22/23 LLM quality cases: Score 5/5
 - 1 edge case (HITL gate): Score 1/5 (expected — pipeline correctly pauses waiting for human confirmation)
-- Overall quality score: 95.6%
+- Overall quality score: 96.5%
+- Eval history tracked per git commit in tests/eval/results/eval_history.jsonl
 
 **Run the eval suite:**
 uv run pytest tests/eval/test_eval_quality.py -v -s
