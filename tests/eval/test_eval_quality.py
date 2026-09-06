@@ -62,8 +62,36 @@ def write_eval_report():
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(markdown)
 
+    # Write append-only JSONL ledger for tracking performance over time
+    ledger_path = "tests/eval/results/eval_history.jsonl"
+    total_cases = len(EVAL_RESULTS)
+    full_score_cases = sum(
+        1 for r in EVAL_RESULTS
+        if r.get("Judge Score") == 5 or (r.get("Judge Score") is None and r.get("Status") == "Passed")
+    )
+    percentage_score = round((full_score_cases / total_cases) * 100, 1) if total_cases > 0 else 0.0
+
+    commit_hash = "unknown"
+    try:
+        import subprocess
+        commit_hash = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    except Exception:
+        pass
+
+    ledger_entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "commit": commit_hash,
+        "total_cases": total_cases,
+        "percentage_score": percentage_score,
+    }
+
+    with open(ledger_path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(ledger_entry) + "\n")
+
     print("\n\n=== EVALUATION REPORT GENERATED ===")
     print(markdown)
+    print(f"=== EVALUATION HISTORY LEDGER UPDATED: {ledger_path} ===")
+    print(json.dumps(ledger_entry))
 
 
 @pytest.mark.parametrize("case", ALL_CASES, ids=lambda c: f"{c.get('_dataset_name')}:{c.get('eval_case_id')}")

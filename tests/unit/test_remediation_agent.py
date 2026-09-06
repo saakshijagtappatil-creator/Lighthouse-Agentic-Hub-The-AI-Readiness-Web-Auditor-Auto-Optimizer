@@ -353,3 +353,71 @@ def test_remediation_rejected(temp_sandbox) -> None:
     rem_res = updated_session.state.get("remediation_result")
     actions = rem_res.get("actions", [])
     assert actions[0]["action_taken"] == "skipped_user_rejected"
+
+
+def test_remediation_path_traversal_blocked(temp_sandbox) -> None:
+    # Setup index.html inside temporary sandbox
+    index_html = temp_sandbox / "index.html"
+    index_html.write_text("<html><body><button id='btn1'>Test</button></body></html>")
+
+    target = TargetRef(
+        source_type="local_path",
+        value=str(temp_sandbox),
+        resolved_at="2026-06-23T00:00:00Z"
+    )
+    audit = AuditResult(
+        target=target,
+        run_at="2026-06-23T00:00:00Z",
+        findings=[],
+        raw_json_path="/tmp/mock.json"
+    )
+    diag = DiagnosisItems(
+        items=[
+            DiagnosisItem(
+                check_id="agent-accessibility-tree",
+                severity="moderate",
+                explanation="Accessibility issues",
+                remediation_type="aria_labels",
+                proposed_action="Add labels"
+            )
+        ]
+    )
+    # Mock RemediationDraft explicitly attempting directory traversal
+    draft = RemediationDraft(
+        aria_suggestions=[
+            AriaLabelSuggestion(
+                file_path="../../../../etc/passwd",
+                selector="button",
+                element_snippet="<button>",
+                aria_label="Hacked Label"
+            )
+        ]
+    )
+
+    agent = RemediationExecuteAgent(name="remediation_execute_agent")
+    session_service = InMemorySessionService()
+    session = session_service.create_session_sync(
+        user_id="test_user",
+        app_name="test",
+        state={
+            "target": target.model_dump(),
+            "audit_result": audit.model_dump(),
+            "diagnosis_items": diag.model_dump(),
+            "remediation_draft": draft.model_dump(),
+            "confirmation_response": "yes",
+            "waiting_for_confirmation": False,
+        }
+    )
+
+    runner = Runner(agent=agent, session_service=session_service, app_name="test")
+    message = types.Content(role="user", parts=[types.Part.from_text(text="yes")])
+    list(runner.run(new_message=message, user_id="test_user", session_id=session.id))
+
+    # Verify action was blocked and recorded as skipped_unsafe
+    updated_session = session_service.get_session_sync(app_name="test", user_id="test_user", session_id=session.id)
+    rem_res = updated_session.state.get("remediation_result")
+    assert rem_res is not None
+    actions = rem_res.get("actions", [])
+    assert len(actions) == 1
+    assert actions[0]["action_taken"] == "skipped_unsafe"
+    assert "outside target directory" in actions[0]["diff_summary"]
